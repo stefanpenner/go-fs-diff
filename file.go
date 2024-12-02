@@ -61,6 +61,10 @@ func (f *File) CreateOperation(relativePath string) op.Operation {
 	return op.NewFileOperation(relativePath)
 }
 
+func (f *File) CreateChangeOperation(relativePath string, reason op.Reason) op.Operation {
+	return op.FileChangedOperation(relativePath, reason)
+}
+
 func (f *File) Type() FolderEntryType {
 	return FILE
 }

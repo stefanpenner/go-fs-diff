@@ -71,6 +71,10 @@ func (f *Folder) RemoveChildOperation(relativePath string) op.Operation {
 	return f.Get(relativePath).RemoveOperation(relativePath)
 }
 
+func (f *Folder) CreateChangeOperation(relativePath string, reason op.Reason) op.Operation {
+	return op.NewChangeFolderOperation(relativePath)
+}
+
 func (f *Folder) CreateOperation(relativePath string) op.Operation {
 	operations := []op.Operation{}
 

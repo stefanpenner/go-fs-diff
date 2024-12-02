@@ -72,10 +72,17 @@ func Diff(a, b *Folder, caseSensitive bool) []op.Operation {
 				operations := Diff(a_entry.(*Folder), b_entry.(*Folder), caseSensitive)
 
 				if len(operations) > 0 {
-					updates = append(updates, op.NewChangeFolderOperation(a_key, operations...))
+					update := b_entry.CreateChangeOperation(b_key, reason)
+					dirValue, ok := update.Value.(op.DirValue)
+					if ok {
+						dirValue.Operations = operations
+					} else {
+						panic("EWUT") // TODO: proper error
+					}
+					updates = append(updates, update)
 				}
 			} else if a_type == FILE && b_type == FILE {
-				updates = append(updates, op.FileChangedOperation(b_key, reason))
+				updates = append(updates, b_entry.CreateChangeOperation(b_key, reason))
 			} else {
 				removals = append(removals, a_entry.RemoveOperation(b_key))
 				additions = append(additions, b_entry.CreateOperation(b_key))

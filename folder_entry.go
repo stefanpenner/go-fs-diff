@@ -1,6 +1,8 @@
 package fsdt
 
-import op "github.com/stefanpenner/go-fsdt/operation"
+import (
+	op "github.com/stefanpenner/go-fsdt/operation"
+)
 
 // Define a custom type for FolderEntryType
 type FolderEntryType string
@@ -20,6 +22,7 @@ type FolderEntry interface {
 	// TODO: consider all operations taking optional reason
 	RemoveOperation(relativePath string) op.Operation
 	CreateOperation(relativePath string) op.Operation
+	CreateChangeOperation(relativePath string, reason op.Reason) op.Operation
 	Type() FolderEntryType
 	Equal(FolderEntry) bool
 	EqualWithReason(FolderEntry) (bool, op.Reason)
