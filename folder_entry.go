@@ -18,8 +18,9 @@ type FolderEntry interface {
 	Clone() FolderEntry
 	Strings(prefix string) []string
 	// TODO: consider all operations taking optional reason
-	RemoveOperation(relativePath string) op.Operation
-	CreateOperation(relativePath string) op.Operation
+	RemoveOperation(relativePath string, reason op.Reason) op.Operation
+	CreateOperation(relativePath string, reason op.Reason) op.Operation
+	ChangeOperation(relativePath string, reason op.Reason, operations ...op.Operation) op.Operation
 	Type() FolderEntryType
 	Equal(FolderEntry) bool
 	EqualWithReason(FolderEntry) (bool, op.Reason)

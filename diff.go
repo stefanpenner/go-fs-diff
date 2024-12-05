@@ -65,20 +65,23 @@ func Diff(a, b *Folder, caseSensitive bool) []op.Operation {
 			equal, reason := a_entry.EqualWithReason(b_entry)
 
 			if equal {
-				// to nothing!
+				// do nothing!
 			} else if a_type == FOLDER && b_type == FOLDER {
+				a_entry := a_entry.(*Folder)
+				b_entry := b_entry.(*Folder)
+
 				// TODO: folder modes can change
 				// they are both folders, so we recurse
-				operations := Diff(a_entry.(*Folder), b_entry.(*Folder), caseSensitive)
+				operations := Diff(a_entry, b_entry, caseSensitive)
 
 				if len(operations) > 0 {
-					updates = append(updates, op.NewChangeFolderOperation(a_key, operations...))
+					updates = append(updates, a_entry.ChangeOperation(a_key, reason, operations...))
 				}
 			} else if a_type == FILE && b_type == FILE {
-				updates = append(updates, op.FileChangedOperation(b_key, reason))
+				updates = append(updates, a_entry.ChangeOperation(b_key, reason))
 			} else {
-				removals = append(removals, a_entry.RemoveOperation(b_key))
-				additions = append(additions, b_entry.CreateOperation(b_key))
+				removals = append(removals, a_entry.RemoveOperation(b_key, reason))
+				additions = append(additions, b_entry.CreateOperation(b_key, reason))
 			}
 
 			a_index++
@@ -86,11 +89,11 @@ func Diff(a, b *Folder, caseSensitive bool) []op.Operation {
 		} else if a_key < b_key {
 			// a is missing from b
 			a_index++
-			removals = append(removals, a.RemoveChildOperation(a_key))
+			removals = append(removals, a.RemoveChildOperation(a_key, op.Reason{})) // TODO: missing reason
 		} else if a_key > b_key {
 			// b is missing form a
 			b_index++
-			removals = append(removals, b.CreateChildOperation(b_key))
+			removals = append(removals, b.CreateChildOperation(b_key, op.Reason{})) // TODO: missing reason
 		} else {
 			panic("fsdt/diff.go(unreachable)")
 		}
@@ -101,14 +104,14 @@ func Diff(a, b *Folder, caseSensitive bool) []op.Operation {
 	for a_index < len(a_keys) {
 		relative_path := a_keys[a_index]
 		a_index++
-		removals = append(removals, a.RemoveChildOperation(relative_path))
+		removals = append(removals, a.RemoveChildOperation(relative_path, op.Reason{}))
 	}
 
 	// if stuff remains in B, add them
 	for b_index < len(b_keys) {
 		relative_path := b_keys[b_index]
 		b_index++
-		additions = append(additions, b.CreateChildOperation(relative_path))
+		additions = append(additions, b.CreateChildOperation(relative_path, op.Reason{}))
 	}
 
 	return append(append(removals, updates...), additions...)

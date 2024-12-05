@@ -53,12 +53,24 @@ func (f *File) Clone() FolderEntry {
 	}
 }
 
-func (f *File) RemoveOperation(relativePath string) op.Operation {
+func (f *File) RemoveOperation(relativePath string, reason op.Reason) op.Operation {
+	// TODO: reason
 	return op.NewUnlink(relativePath)
 }
 
-func (f *File) CreateOperation(relativePath string) op.Operation {
+func (f *File) CreateOperation(relativePath string, reason op.Reason) op.Operation {
+	// TODO: reason
 	return op.NewFileOperation(relativePath)
+}
+
+func (f *File) ChangeOperation(relativePath string, reason op.Reason, operations ...op.Operation) op.Operation {
+	return op.Operation{
+		Operand:      op.ChangeFile,
+		RelativePath: relativePath,
+		Value: op.FileChangedValue{
+			Reason: reason,
+		},
+	}
 }
 
 func (f *File) Type() FolderEntryType {

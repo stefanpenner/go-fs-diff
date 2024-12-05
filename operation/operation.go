@@ -1,5 +1,9 @@
 package operation
 
+import (
+	"fmt"
+)
+
 type (
 	Operand string
 )
@@ -36,4 +40,10 @@ type Operation struct {
 	RelativePath string
 	Value        interface{}
 	Operand      Operand
+}
+
+func (op Operation) String() string {
+	result := fmt.Sprintf("%s %s", op.Operand, op.RelativePath)
+	// TODO: implement printing of value, which includes nesting
+	return result
 }

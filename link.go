@@ -41,7 +41,8 @@ func (l *Link) Clone() FolderEntry {
 	return NewLink(l.target, l.link_type)
 }
 
-func (l *Link) RemoveOperation(relativePath string) op.Operation {
+func (l *Link) RemoveOperation(relativePath string, reason op.Reason) op.Operation {
+	// TODO: reason
 	return op.NewUnlink(relativePath)
 }
 
@@ -56,8 +57,14 @@ func (l *Link) OperationLinkType() op.LinkType {
 	}
 }
 
-func (l *Link) CreateOperation(relativePath string) op.Operation {
+func (l *Link) CreateOperation(relativePath string, reason op.Reason) op.Operation {
+	// TODO: reason
 	return op.NewCreateLink(relativePath, l.Target(), l.OperationLinkType())
+}
+
+func (l *Link) ChangeOperation(relativePath string, reason op.Reason, operations ...op.Operation) op.Operation {
+	panic("no implemented")
+	return op.Operation{}
 }
 
 func (l *Link) Equal(entry FolderEntry) bool {
